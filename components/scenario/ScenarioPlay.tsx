@@ -1,7 +1,7 @@
 "use client";
 
 import { ChoiceButton } from "@/components/scenario/ChoiceButton";
-import { RexMessage } from "@/components/rex/RexMessage";
+import { ScenarioRexCoach } from "@/components/scenario/ScenarioRexCoach";
 import { recordLocalScenarioCompletion } from "@/lib/local-progress";
 import type { NegotiationScenario } from "@/types";
 import { useRouter } from "next/navigation";
@@ -11,23 +11,30 @@ type Props = {
   scenario: NegotiationScenario;
 };
 
-/** Scénario interactif : enregistre la complétion en local puis affiche le résultat */
+/** Scénario : coach Rex avec fade out 200ms au clic */
 export function ScenarioPlay({ scenario }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [coachVisible, setCoachVisible] = useState(true);
 
   function onChoose(choiceId: string) {
+    if (busy) return;
     setBusy(true);
+    setCoachVisible(false);
     setError(null);
-    const res = recordLocalScenarioCompletion(scenario.id, choiceId);
-    if (!res.ok) {
-      setError(res.error);
-      setBusy(false);
-      return;
-    }
-    router.push(`/scenario/${scenario.id}/result?c=${choiceId}`);
-    router.refresh();
+
+    window.setTimeout(() => {
+      const res = recordLocalScenarioCompletion(scenario.id, choiceId);
+      if (!res.ok) {
+        setError(res.error);
+        setBusy(false);
+        setCoachVisible(true);
+        return;
+      }
+      router.push(`/scenario/${scenario.id}/result?c=${choiceId}`);
+      router.refresh();
+    }, 200);
   }
 
   return (
@@ -40,7 +47,7 @@ export function ScenarioPlay({ scenario }: Props) {
         <p className="mt-3 text-navy/80">{scenario.context}</p>
       </div>
 
-      <RexMessage>{scenario.rexIntro}</RexMessage>
+      <ScenarioRexCoach visible={coachVisible} />
 
       <div className="grid gap-3">
         {scenario.choices.map((ch) => (

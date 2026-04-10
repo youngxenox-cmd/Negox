@@ -1,38 +1,46 @@
+"use client";
+
 import { cn } from "@/lib/utils";
-import type { RexMood } from "@/types";
+import type { RexPose } from "@/lib/rex-assets";
+import { REX_IMAGE } from "@/lib/rex-assets";
 
-type Props = {
-  mood: RexMood;
-  size?: "sm" | "md" | "lg";
+export type { RexPose };
+
+export interface RexAvatarProps {
+  pose: RexPose;
+  size?: number;
+  bounce?: boolean;
   className?: string;
-};
+  alt?: string;
+}
 
-/** Mascotte Rex (renard) — états visuels simplifiés */
-export function RexAvatar({ mood, size = "md", className }: Props) {
-  const sizes = {
-    sm: "h-16 w-16 text-3xl",
-    md: "h-24 w-24 text-5xl",
-    lg: "h-36 w-36 text-7xl",
-  };
-  const ring =
-    mood === "happy"
-      ? "ring-success/40"
-      : mood === "sad"
-        ? "ring-error/40"
-        : "ring-amber/50";
+/** Mascotte Rex — hauteur `size` (px), largeur auto (ratio conservé) */
+export function RexAvatar({
+  pose,
+  size = 80,
+  bounce = false,
+  className,
+  alt = "Rex, ton coach renard",
+}: RexAvatarProps) {
+  const src = REX_IMAGE[pose];
 
   return (
     <div
       className={cn(
-        "flex items-center justify-center rounded-full bg-gradient-to-br from-primary to-amber shadow-lg ring-4",
-        ring,
-        sizes[size],
+        "relative inline-flex shrink-0 select-none items-end",
+        bounce && "rex-bounce",
         className
       )}
-      role="img"
-      aria-label={`Rex est ${mood === "happy" ? "content" : mood === "sad" ? "déçu" : "enthousiaste"}`}
     >
-      <span>🦊</span>
+      {/* eslint-disable-next-line @next/next/no-img-element -- tailles dynamiques par pose */}
+      <img
+        src={src}
+        alt={alt}
+        height={size}
+        className="h-auto w-auto max-h-full object-contain object-bottom"
+        style={{ height: size, width: "auto" }}
+        draggable={false}
+      />
     </div>
   );
 }

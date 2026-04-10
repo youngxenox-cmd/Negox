@@ -1,23 +1,16 @@
 "use client";
 
-import { ResultScreen } from "@/components/scenario/ResultScreen";
+import { ResultRex } from "@/components/scenario/ResultRex";
 import { getScenarioById } from "@/data/scenarios";
 import { getBestChoice, getNextScenarioId } from "@/lib/gamification";
 import { loadProfile } from "@/lib/local-progress";
-import type { RexMood } from "@/types";
 
 type Props = {
   scenarioId: string;
   choiceId: string;
 };
 
-function moodFromScore(score: number): RexMood {
-  if (score >= 80) return "excited";
-  if (score >= 40) return "happy";
-  return "sad";
-}
-
-/** Résultat : lit la progression locale pour le bouton « suivant » */
+/** Résultat : progression locale + écran Rex */
 export function ScenarioResultView({ scenarioId, choiceId }: Props) {
   const scenario = getScenarioById(scenarioId);
   if (!scenario) return null;
@@ -28,7 +21,6 @@ export function ScenarioResultView({ scenarioId, choiceId }: Props) {
   const completed = new Set(Object.keys(profile.progress));
   const nextId = getNextScenarioId(completed);
   const best = getBestChoice(scenario);
-  const mood = moodFromScore(choice.score);
 
   const nextHref =
     nextId && nextId !== scenario.id ? `/scenario/${nextId}` : "/worlds";
@@ -36,12 +28,12 @@ export function ScenarioResultView({ scenarioId, choiceId }: Props) {
     nextId && nextId !== scenario.id ? "Scénario suivant" : "Voir les mondes";
 
   return (
-    <ResultScreen
-      scenario={scenario}
-      eurResult={choice.eur_result}
+    <ResultRex
+      score={choice.score}
+      eurEarned={choice.eur_result}
       feedback={choice.feedback}
-      mood={mood}
-      bestExplanation={best?.feedback}
+      bestFeedback={best?.feedback}
+      scenarioTitle={scenario.title}
       nextHref={nextHref}
       nextLabel={nextLabel}
     />

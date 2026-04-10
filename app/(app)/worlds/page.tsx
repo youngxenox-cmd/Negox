@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/Card";
+import { RexWorldsHint } from "@/components/rex/RexWorldsHint";
 import { useLocalProfile } from "@/hooks/useLocalProfile";
 import { getWorldsOrdered } from "@/data/worlds";
 import {
@@ -23,6 +24,7 @@ export default function WorldsPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
+      <RexWorldsHint />
       <h1 className="text-2xl font-black text-navy">Carte des mondes</h1>
       <p className="mt-1 text-sm text-navy/65">
         Débloque la suite en complétant au moins 50 % du monde précédent.
