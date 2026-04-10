@@ -1,29 +1,25 @@
+"use client";
+
 import { Card } from "@/components/ui/Card";
+import { useLocalProfile } from "@/hooks/useLocalProfile";
 import { getWorldsOrdered } from "@/data/worlds";
 import {
   isWorldCompleted,
   isWorldUnlocked,
   worldCompletionRatio,
 } from "@/lib/gamification";
-import { createClient } from "@/lib/supabase/server";
+import { getCompletedScenarioIds } from "@/lib/local-progress";
 import { Lock } from "lucide-react";
 import Link from "next/link";
 
-export default async function WorldsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+export default function WorldsPage() {
+  const { profile, ready } = useLocalProfile();
 
-  const { data: progressRows } = await supabase
-    .from("user_progress")
-    .select("scenario_id")
-    .eq("user_id", user.id);
+  if (!ready || !profile) {
+    return <p className="text-center text-sm text-navy/60">Chargement…</p>;
+  }
 
-  const completed = new Set(
-    (progressRows ?? []).map((r) => r.scenario_id as string)
-  );
+  const completed = getCompletedScenarioIds(profile);
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -39,8 +35,7 @@ export default async function WorldsPage() {
             completed
           );
           const doneWorld = isWorldCompleted(w.id, completed);
-          const pct =
-            total > 0 ? Math.round((done / total) * 100) : 0;
+          const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
           const inner = (
             <Card

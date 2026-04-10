@@ -1,8 +1,8 @@
 "use client";
 
-import { recordScenarioCompletion } from "@/app/actions/scenario";
 import { ChoiceButton } from "@/components/scenario/ChoiceButton";
 import { RexMessage } from "@/components/rex/RexMessage";
+import { recordLocalScenarioCompletion } from "@/lib/local-progress";
 import type { NegotiationScenario } from "@/types";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -11,16 +11,16 @@ type Props = {
   scenario: NegotiationScenario;
 };
 
-/** Scénario interactif : enregistre la complétion puis affiche le résultat */
+/** Scénario interactif : enregistre la complétion en local puis affiche le résultat */
 export function ScenarioPlay({ scenario }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function onChoose(choiceId: string) {
+  function onChoose(choiceId: string) {
     setBusy(true);
     setError(null);
-    const res = await recordScenarioCompletion(scenario.id, choiceId);
+    const res = recordLocalScenarioCompletion(scenario.id, choiceId);
     if (!res.ok) {
       setError(res.error);
       setBusy(false);

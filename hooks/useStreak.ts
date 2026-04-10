@@ -1,30 +1,9 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
+import { useLocalProfile } from "@/hooks/useLocalProfile";
 
-/** Streak courant depuis le profil */
+/** Série (jours) depuis le profil local */
 export function useStreak() {
-  const [streak, setStreak] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) {
-        setStreak(null);
-        setLoading(false);
-        return;
-      }
-      const { data } = await supabase
-        .from("profiles")
-        .select("streak_current")
-        .eq("id", user.id)
-        .single();
-      setStreak(data?.streak_current ?? 0);
-      setLoading(false);
-    });
-  }, []);
-
-  return { streak, loading };
+  const { profile, ready } = useLocalProfile();
+  return { streak: profile?.streak_current ?? null, loading: !ready };
 }

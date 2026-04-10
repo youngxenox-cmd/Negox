@@ -1,36 +1,30 @@
+"use client";
+
 import { ScenarioCard } from "@/components/scenario/ScenarioCard";
 import { WORLDS, getScenariosForWorld } from "@/data/worlds";
+import { useLocalProfile } from "@/hooks/useLocalProfile";
 import { isWorldUnlocked } from "@/lib/gamification";
-import { createClient } from "@/lib/supabase/server";
+import { getCompletedScenarioIds } from "@/lib/local-progress";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 
-type Props = { params: { worldId: string } };
+export default function WorldDetailPage() {
+  const params = useParams();
+  const worldId = params.worldId as string;
+  const { profile, ready } = useLocalProfile();
 
-export default async function WorldDetailPage({ params }: Props) {
-  const { worldId } = params;
   const world = WORLDS.find((w) => w.id === worldId);
-  if (!world) notFound();
-
   const scenarios = getScenariosForWorld(worldId).sort(
     (a, b) => a.orderIndex - b.orderIndex
   );
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  if (!world) notFound();
 
-  const { data: progressRows } = await supabase
-    .from("user_progress")
-    .select("scenario_id")
-    .eq("user_id", user.id);
+  if (!ready || !profile) {
+    return <p className="text-center text-sm text-navy/60">Chargement…</p>;
+  }
 
-  const completed = new Set(
-    (progressRows ?? []).map((r) => r.scenario_id as string)
-  );
-
+  const completed = getCompletedScenarioIds(profile);
   const unlocked = isWorldUnlocked(worldId, completed);
 
   return (

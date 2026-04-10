@@ -1,29 +1,12 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
-import type { User } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useLocalProfile } from "@/hooks/useLocalProfile";
 
-/** Utilisateur Supabase Auth côté client */
+/** Remplace l’ancien hook auth : pas de compte, nom affiché = profil local */
 export function useUser() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
-      setLoading(false);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  return { user, loading };
+  const { profile, ready } = useLocalProfile();
+  return {
+    displayName: profile?.username ?? "Joueur",
+    loading: !ready,
+  };
 }

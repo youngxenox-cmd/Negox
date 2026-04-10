@@ -1,60 +1,19 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const protectedPrefixes = ["/home", "/worlds", "/scenario", "/profile"];
-
-function isProtectedPath(pathname: string) {
-  return protectedPrefixes.some(
-    (p) => pathname === p || pathname.startsWith(p + "/")
-  );
-}
-
-export async function middleware(request: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) {
-    return NextResponse.next({ request });
+/** Anciennes URLs auth → app (au cas où le cache garde encore ces routes) */
+export function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+  if (
+    path === "/login" ||
+    path === "/signup" ||
+    path.startsWith("/login/") ||
+    path.startsWith("/signup/")
+  ) {
+    return NextResponse.redirect(new URL("/home", request.url));
   }
-
-  let supabaseResponse = NextResponse.next({ request });
-
-  const supabase = createServerClient(
-    url,
-    key,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (isProtectedPath(request.nextUrl.pathname) && !user) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("redirect", request.nextUrl.pathname);
-    return NextResponse.redirect(url);
-  }
-
-  return supabaseResponse;
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/login", "/signup", "/login/:path*", "/signup/:path*"],
 };

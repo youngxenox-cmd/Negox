@@ -1,4 +1,3 @@
-import { StreakSessionSync } from "@/components/gamification/StreakSessionSync";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { Sidebar } from "@/components/layout/Sidebar";
 
@@ -10,7 +9,6 @@ export default function AppLayout({
 }>) {
   return (
     <div className="mx-auto flex min-h-[calc(100vh-57px)] max-w-6xl">
-      <StreakSessionSync />
       <Sidebar />
       <main className="flex-1 px-4 pb-24 pt-6 md:pb-8">{children}</main>
       <MobileNav />
