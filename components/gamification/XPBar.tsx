@@ -1,4 +1,5 @@
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { XP_PER_LEVEL } from "@/lib/gamification";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -6,9 +7,7 @@ type Props = {
   className?: string;
 };
 
-const XP_PER_LEVEL = 500;
-
-/** Barre XP dans le niveau courant */
+/** Barre XP dans le niveau courant (même palier que `levelFromXp`) */
 export function XPBar({ xpTotal, className }: Props) {
   const level = Math.floor(xpTotal / XP_PER_LEVEL) + 1;
   const inLevel = xpTotal % XP_PER_LEVEL;

@@ -21,7 +21,7 @@ export function Sidebar({ className }: Props) {
   return (
     <aside
       className={cn(
-        "hidden w-56 shrink-0 flex-col gap-1 border-r border-navy/5 bg-white/80 p-4 md:flex",
+        "hidden min-h-[calc(100vh-57px)] w-56 shrink-0 flex-col gap-1 border-r border-navy/10 bg-white p-4 md:flex",
         className
       )}
     >

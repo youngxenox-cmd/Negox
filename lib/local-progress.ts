@@ -100,11 +100,27 @@ function addBadgeIfNew(p: LocalProfile, id: string): LocalProfile {
   return { ...p, badges: [...p.badges, id] };
 }
 
+export type RecordScenarioSuccess = {
+  ok: true;
+  xpGained: number;
+  eurDelta: number;
+  leveledUp: boolean;
+  previousLevel: number;
+  newLevel: number;
+  newBadges: string[];
+  streakIncreased: boolean;
+  streakCurrent: number;
+};
+
+export type RecordScenarioResult =
+  | RecordScenarioSuccess
+  | { ok: false; error: string };
+
 /** Enregistre la fin d’un scénario (local uniquement) */
 export function recordLocalScenarioCompletion(
   scenarioId: string,
   choiceId: string
-): { ok: true } | { ok: false; error: string } {
+): RecordScenarioResult {
   const scenario = getScenarioById(scenarioId);
   if (!scenario) return { ok: false, error: "Scénario inconnu" };
   const choice = scenario.choices.find((c) => c.id === choiceId);
@@ -112,6 +128,11 @@ export function recordLocalScenarioCompletion(
 
   let p = loadProfile();
   p = normalizeStreakIfStale(p);
+
+  const badgesBefore = new Set(p.badges);
+  const streakBefore = p.streak_current;
+  const xpBefore = p.xp_total;
+  const previousLevel = levelFromXp(xpBefore);
 
   const score = choice.score;
   const eurEarned = choice.eur_result;
@@ -158,5 +179,20 @@ export function recordLocalScenarioCompletion(
   if (streakUp.streak_current >= 7) p = addBadgeIfNew(p, "streak_7");
 
   saveProfile(p);
-  return { ok: true };
+
+  const newBadges = p.badges.filter((b) => !badgesBefore.has(b));
+  const leveledUp = newLevel > previousLevel;
+  const streakIncreased = streakUp.streak_current > streakBefore;
+
+  return {
+    ok: true,
+    xpGained: xpGain,
+    eurDelta,
+    leveledUp,
+    previousLevel,
+    newLevel,
+    newBadges,
+    streakIncreased,
+    streakCurrent: streakUp.streak_current,
+  };
 }

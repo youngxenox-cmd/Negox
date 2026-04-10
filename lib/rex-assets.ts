@@ -1,4 +1,4 @@
-/** PNG RGBA fond transparent — découpés depuis `public/rex/rex-sheet.png` (grille 2-1-2) */
+/** PNG RGBA — générés par `scripts/crop-rex-sheet.py` (mascotte seule, sans texte du sprite) */
 export type RexPose = "neutral" | "celebrate" | "thinking" | "sad" | "point";
 
 export const REX_IMAGE: Record<RexPose, string> = {

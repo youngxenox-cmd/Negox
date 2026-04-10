@@ -1,14 +1,20 @@
 import type { NegotiationScenario } from "@/types";
 import { getScenariosForWorld, getWorldsOrdered } from "@/data/worlds";
 
-/** XP pour un scénario terminé */
+/** XP nécessaires pour passer un palier de niveau (progression plus lente, plus réaliste) */
+export const XP_PER_LEVEL = 2800;
+
+/**
+ * XP pour un scénario terminé.
+ * Formule : score × difficulté × facteur (réduit vs ancien ×10 pour une montée en niveau plus douce).
+ */
 export function computeXpGained(score: number, difficulty: number): number {
-  return Math.round(score * difficulty * 10);
+  return Math.round((score * difficulty * 35) / 10);
 }
 
-/** Niveau à partir du total XP (palier 500 XP / niveau) */
+/** Niveau à partir du total XP (niveau 1 à 0 XP, puis +1 tous les XP_PER_LEVEL) */
 export function levelFromXp(xpTotal: number): number {
-  return Math.floor(xpTotal / 500) + 1;
+  return Math.floor(xpTotal / XP_PER_LEVEL) + 1;
 }
 
 /** EUR ajouté au cumul profil (jamais négatif) */

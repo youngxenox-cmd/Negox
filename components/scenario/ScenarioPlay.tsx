@@ -3,6 +3,7 @@
 import { ChoiceButton } from "@/components/scenario/ChoiceButton";
 import { ScenarioRexCoach } from "@/components/scenario/ScenarioRexCoach";
 import { recordLocalScenarioCompletion } from "@/lib/local-progress";
+import { notifyScenarioCompletion } from "@/lib/scenario-toasts";
 import type { NegotiationScenario } from "@/types";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -32,6 +33,7 @@ export function ScenarioPlay({ scenario }: Props) {
         setCoachVisible(true);
         return;
       }
+      notifyScenarioCompletion(res);
       router.push(`/scenario/${scenario.id}/result?c=${choiceId}`);
       router.refresh();
     }, 200);

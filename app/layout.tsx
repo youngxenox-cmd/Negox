@@ -1,4 +1,5 @@
 import { Navbar } from "@/components/layout/Navbar";
+import { AppToaster } from "@/components/providers/AppToaster";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="fr" className={inter.variable}>
       <body className="min-h-screen font-sans antialiased">
         <Navbar />
+        <AppToaster />
         {children}
       </body>
     </html>
