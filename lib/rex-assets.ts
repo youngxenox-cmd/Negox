@@ -1,4 +1,4 @@
-/** Chemins publics des assets Rex (sprites découpés dans /public/rex/) */
+/** PNG RGBA fond transparent — découpés depuis `public/rex/rex-sheet.png` (grille 2-1-2) */
 export type RexPose = "neutral" | "celebrate" | "thinking" | "sad" | "point";
 
 export const REX_IMAGE: Record<RexPose, string> = {

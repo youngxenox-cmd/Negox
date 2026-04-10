@@ -17,7 +17,7 @@ export function Navbar() {
             alt=""
             width={120}
             height={32}
-            className="h-8 w-auto object-contain object-bottom"
+            className="rex-asset-img h-8 w-auto object-contain object-bottom"
           />
           <span className="hidden text-xl font-extrabold tracking-tight text-[#E8500A] sm:inline">
             NEGOX
